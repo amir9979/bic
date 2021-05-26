@@ -69,7 +69,6 @@ if __name__ == '__main__':
 
     # Commits Handling
     repo_path = r"local_repo"
-    # repo_path = r"c:\temp\camel2"
     # comms = get_commits_files(r"local_repo")
     all_commits = get_commits_files(repo_path)
     commits = all_commits[commits_start: commits_end]
