@@ -64,7 +64,8 @@ if __name__ == '__main__':
 
     window_size = 500
     window_size = 5
-    commits_start = int(sys.argv[1]) * window_size
+    ind = int(sys.argv[1])
+    commits_start = ind * window_size
     commits_end = commits_start + window_size
 
     # Commits Handling
@@ -82,5 +83,5 @@ if __name__ == '__main__':
         c = get_commit_diff(repo_path, commit)
         if c:
             metrics.extend(c.get_metrics())
-    print(f'.\\results\\{commits_start}.csv')
-    pd.DataFrame(metrics).to_csv(f'./results/{commits_start}.csv', index=False)
+    print(f'.\\results\\{ind}.csv')
+    pd.DataFrame(metrics).to_csv(f'./results/{ind}.csv', index=False)
