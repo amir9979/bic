@@ -77,5 +77,7 @@ if __name__ == '__main__':
 
     metrics = []
     for commit in commits:
-        metrics.extend(get_commit_diff(repo_path, commit).get_metrics())
+        c = get_commit_diff(repo_path, commit)
+        if c:
+            metrics.extend(c.get_metrics())
     pd.DataFrame(metrics).to_csv(f'.\\results\\{commits_start}.csv', index=False)
