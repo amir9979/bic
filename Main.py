@@ -63,7 +63,6 @@ if __name__ == '__main__':
     # Set variables according to the project
 
     window_size = 500
-    window_size = 5
     ind = int(sys.argv[1])
     commits_start = ind * window_size
     commits_end = commits_start + window_size
