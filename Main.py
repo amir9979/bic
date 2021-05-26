@@ -77,6 +77,7 @@ if __name__ == '__main__':
 
     metrics = []
     for commit in commits:
+        print(commit)
         c = get_commit_diff(repo_path, commit)
         if c:
             metrics.extend(c.get_metrics())
