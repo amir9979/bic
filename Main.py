@@ -69,7 +69,7 @@ if __name__ == '__main__':
 
     # Commits Handling
     repo_path = r"local_repo"
-    # comms = get_commits_files(r"local_repo")
+        # comms = get_commits_files(r"local_repo")
     all_commits = get_commits_files(repo_path)
     commits = all_commits[commits_start: commits_end]
     if len(commits) == 0:
@@ -78,7 +78,7 @@ if __name__ == '__main__':
     metrics = []
     for commit in commits:
         print(commit)
-        c = get_commit_diff(repo_path, commit)
+        c = get_commit_diff(repo_path, commit, analyze_diff=True)
         if c:
             metrics.extend(c.get_metrics())
     print(f'.\\results\\{ind}.csv')

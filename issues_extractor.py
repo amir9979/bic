@@ -225,4 +225,7 @@ def save_to_json(commits, repo_full_name, out_json):
 
 
 if __name__ == "__main__":
+    java_commits = _get_commits_files(git.Repo(r"c:\temp\camel2"))
+    from functools import reduce
+    all_commits = reduce(list.__add__, list(java_commits.values()), [])
     extract_json(r"local_repo", "CAMEL", 'apache/camel', 'bugfixes.json', 'non_tests_bugfixes.json')
