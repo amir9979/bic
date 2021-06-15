@@ -54,12 +54,14 @@ jobs:
           pip install numpy
           pip install pydriller
           pip install dataclasses
+          pip install jsons
 
       - name: javadiff_install
         run: python ./javadiff/setup.py install
 
       - uses: actions/setup-java@v2
         with:
+          distribution: 'adopt' 
           java-version: '11'
 
       - name: Checkout tools repo
