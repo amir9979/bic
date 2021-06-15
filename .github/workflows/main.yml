@@ -57,7 +57,11 @@ jobs:
 
       - name: javadiff_install
         run: python ./javadiff/setup.py install
-      
+
+      - uses: actions/setup-java@v2
+        with:
+          java-version: '11'
+
       - name: Checkout tools repo
         continue-on-error: true
         uses: actions/checkout@v2
