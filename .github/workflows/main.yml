@@ -76,8 +76,8 @@ jobs:
           path: ./local_repo
           fetch-depth: 0
 
-#       - name: execute
-#         run: python Main.py ${{ matrix.commit_ind }} 
+      - name: execute
+        run: python Main.py ${{ matrix.commit_ind }} 
 
       - name: Upload data
         if: ${{ always() }}
