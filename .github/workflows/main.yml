@@ -65,7 +65,7 @@ jobs:
           java-version: '12'
       
       - name: check variables
-        run: set
+        run: python.exe -c "import os;print(os.environ)"
 
 
       - name: Checkout tools repo
