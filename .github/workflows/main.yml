@@ -91,6 +91,15 @@ jobs:
               print("size 0")
             else:
                print("size > 0")
+          
+          
+#      - name: execute_pmd_from_javadiff
+#        shell: python
+#        run: |
+#              try:
+#                from javadiff.javadiff.SourceFile import SourceFile
+#              except:
+#                from javadiff.SourceFile import SourceFile
 
           
 
