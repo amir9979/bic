@@ -81,9 +81,10 @@ jobs:
         run: |
             from subprocess import run
             import os
-            run([r'./javadiff/externals/java/OpenStaticAnalyzerJava.exe',
-            '-resultsDir=' + './results', '-projectName=' +
-            'tmpoy7hlu4m', '-projectBaseDir=' + 'tmpoy7hlu4m', 'tmpoy7hlu4m/tmp10lpybf5.java'])
+            run([os.path.abspath(r'./javadiff/externals/java/OpenStaticAnalyzerJava.exe'),
+            '-resultsDir=' + os.path.abspath('./results'), '-projectName=' +
+            'tmpoy7hlu4m', '-projectBaseDir=' + os.path.abspath('tmpoy7hlu4m'), os.path.abspath('tmpoy7hlu4m/tmp10lpybf5.java')])
+            
             directory_path = os.path.join('./results', 'tmpoy7hlu4m', "java")
             directory_path = os.path.abspath(os.path.join(directory_path, os.listdir(directory_path)[0], 'tmpoy7hlu4m'))
             if os.path.getsize(directory_path + "-PMD.txt") != 0:
