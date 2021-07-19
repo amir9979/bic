@@ -80,10 +80,10 @@ jobs:
         shell: python
         run: |
             from subprocess import run
-            run([r'..\externals\java\OpenStaticAnalyzerJava.exe')),
-              '-resultsDir=' + './results', '-projectName=' +
-              name_project, '-projectBaseDir=' + 'tmpoy7hlu4m' , 'tmpoy7hlu4m\\tmp10lpybf5.java'])
-         
+            run([r'..\externals\java\OpenStaticAnalyzerJava.exe',
+            '-resultsDir=' + './results', '-projectName=' +
+            'tmpoy7hlu4m', '-projectBaseDir=' + 'tmpoy7hlu4m', 'tmpoy7hlu4m/tmp10lpybf5.java'])
+
           
 
 #       - name: execute
