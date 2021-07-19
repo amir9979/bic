@@ -75,9 +75,19 @@ jobs:
           repository: ${{github.event.issue.title}}
           path: ./local_repo
           fetch-depth: 0
+          
+      - name: execute_pmd
+        shell: python
+        run: |
+            from subprocess import run
+            run([r'..\externals\java\OpenStaticAnalyzerJava.exe')),
+              '-resultsDir=' + './results', '-projectName=' +
+              name_project, '-projectBaseDir=' + 'tmpoy7hlu4m' , 'tmpoy7hlu4m\\tmp10lpybf5.java'])
+         
+          
 
-      - name: execute
-        run: python Main.py ${{ matrix.commit_ind }} 
+#       - name: execute
+#         run: python Main.py ${{ matrix.commit_ind }} 
 
       - name: Upload data
         if: ${{ always() }}
