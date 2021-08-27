@@ -76,21 +76,21 @@ jobs:
           path: ./local_repo
           fetch-depth: 0
           
-      - name: execute_pmd
-        shell: python
-        run: |
-            from subprocess import run
-            import os
-            run([os.path.abspath(r'./javadiff/externals/java/OpenStaticAnalyzerJava.exe'),
-            '-resultsDir=' + os.path.abspath('./results'), '-projectName=' +
-            'tmpoy7hlu4m', '-projectBaseDir=' + os.path.abspath('tmpoy7hlu4m'), os.path.abspath('tmpoy7hlu4m/tmp10lpybf5.java')])
+#       - name: execute_pmd
+#         shell: python
+#         run: |
+#             from subprocess import run
+#             import os
+#             run([os.path.abspath(r'./javadiff/externals/java/OpenStaticAnalyzerJava.exe'),
+#             '-resultsDir=' + os.path.abspath('./results'), '-projectName=' +
+#             'tmpoy7hlu4m', '-projectBaseDir=' + os.path.abspath('tmpoy7hlu4m'), os.path.abspath('tmpoy7hlu4m/tmp10lpybf5.java')])
             
-            directory_path = os.path.join('./results', 'tmpoy7hlu4m', "java")
-            directory_path = os.path.abspath(os.path.join(directory_path, os.listdir(directory_path)[0], 'tmpoy7hlu4m'))
-            if os.path.getsize(directory_path + "-PMD.txt") != 0:
-              print("size 0")
-            else:
-               print("size > 0")
+#             directory_path = os.path.join('./results', 'tmpoy7hlu4m', "java")
+#             directory_path = os.path.abspath(os.path.join(directory_path, os.listdir(directory_path)[0], 'tmpoy7hlu4m'))
+#             if os.path.getsize(directory_path + "-PMD.txt") != 0:
+#               print("size 0")
+#             else:
+#                print("size > 0")
           
           
 #      - name: execute_pmd_from_javadiff
@@ -103,8 +103,8 @@ jobs:
 
           
 
-#       - name: execute
-#         run: python Main.py ${{ matrix.commit_ind }} 
+      - name: execute
+        run: python Main.py ${{ matrix.commit_ind }} 
 
       - name: Upload data
         if: ${{ always() }}
