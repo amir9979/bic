@@ -65,8 +65,8 @@ if __name__ == '__main__':
     ind = int(sys.argv[1])
     commits_start = ind * window_size
     commits_end = commits_start + window_size
-    repo_path = r"C:\Users\shirs\Downloads\commons-collections"
-    # repo_path = r"local_repo"
+#     repo_path = r"C:\Users\shirs\Downloads\commons-collections"
+    repo_path = r"local_repo"
     all_commits = read_commit(repo_path)
     dir_repo = tempfile.mkdtemp()
     empty_repo = git.Repo.init(os.path.join(dir_repo, 'repo'))
