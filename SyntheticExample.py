@@ -34,8 +34,11 @@ def apply_diffmin(path_to_dir):
 
 
 def commit_to_repo(file_name):
+    # TODO: check with amir how we can don't write the before
+    empty_repo.index.add([os.path.join(dir_repo, "before.java")])
+    list_commits_repo.append(empty_repo.index.commit("before"))
     empty_repo.index.add([os.path.join(dir_repo, file_name)])
-    list_commits_repo.append(empty_repo.index.commit("test"))
+    list_commits_repo.append(empty_repo.index.commit("after"))
 
 
 def write_file():
@@ -43,29 +46,23 @@ def write_file():
         for parent in commit.parents:
             diff_index = parent.diff(commit)
             for diff in diff_index:
-                path_to_dir = None
                 try:
-                    path_to_dir = tempfile.mkdtemp()
                     parent_contents = diff.a_blob.data_stream.read().decode('utf-8')
                     current_contents = diff.b_blob.data_stream.read().decode('utf-8')
-                    with open(os.path.join(path_to_dir, "before.java"), 'w', encoding="utf-8") as f:
+                    with open(os.path.join(dir_repo, "before.java"), 'w', encoding="utf-8") as f:
                         f.writelines(parent_contents)
-                    with open(os.path.join(path_to_dir, "after.java"), 'w', encoding="utf-8") as f:
+                    with open(os.path.join(dir_repo, "after.java"), 'w', encoding="utf-8") as f:
                         f.writelines(current_contents)
-                    apply_diffmin(path_to_dir)
+                    apply_diffmin(dir_repo)
                 except:
                     pass
-                finally:
-                    if path_to_dir:
-                        shutil.rmtree(path_to_dir)
-
 
 if __name__ == '__main__':
     window_size = 3
     ind = int(sys.argv[1])
     commits_start = ind * window_size
     commits_end = commits_start + window_size
-#     repo_path = r"C:\Users\shirs\Downloads\commons-collections"
+    # repo_path = r"C:\Users\shirs\Downloads\commons-collections"
     repo_path = r"local_repo"
     all_commits = read_commit(repo_path)
     dir_repo = tempfile.mkdtemp()
