@@ -67,9 +67,11 @@ jobs:
         with:
           distribution: 'adopt' 
           java-version: ${{ matrix.java }}
-      
-      - name: check variables
-        run: python.exe -c "import os;print(os.environ)"
+      - name: execute_pmd
+        shell: python
+        run: |
+         import subprocess
+         print(run([java -version])
 
 
       - name: Checkout tools repo
