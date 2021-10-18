@@ -66,13 +66,7 @@ jobs:
       - uses: actions/setup-java@v2
         with:
           distribution: 'adopt' 
-          java-version: ${{ matrix.java }}
-      - name: execute_pmd
-        shell: python
-        run: |
-         import subprocess
-         print(run([java -version])
-
+          java-version: '8' #${{ matrix.java }}
 
       - name: Checkout tools repo
         continue-on-error: true
