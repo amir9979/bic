@@ -2,7 +2,7 @@ import os
 import shutil
 import sys
 import tempfile
-from subprocess import run
+import subprocess
 import git
 import pandas as pd
 
@@ -25,16 +25,14 @@ def read_commit(repo_path):
 
 def apply_diffmin(path_to_dir):
     # TODO jar
-    # file_name = run(["java", "-jar", r"externals\target/diffmin-1.0-SNAPSHOT-jar-with-dependencies.jar",
-    #                  os.path.join(path_to_dir, "before.java"), os.path.join(path_to_dir, "after.java")])
-    # TODO: write to file in dir_repo
-    with open(os.path.join(dir_repo, "test.java"), 'w', encoding="utf-8") as f:
-        f.writelines("")
-    commit_to_repo("test.java")
+    file = subprocess.check_output(["java", "-jar", r"externals/diffmin-1.0-SNAPSHOT-jar-with-dependencies.jar",
+                     os.path.join(path_to_dir, "before.java"), os.path.join(path_to_dir, "after.java")])
+    with open(os.path.join(dir_repo, "new.java"), 'w', encoding="utf-8") as f:
+        f.writelines(str(file))
+    commit_to_repo("new.java")
 
 
 def commit_to_repo(file_name):
-    # TODO: check with amir how we can don't write the before
     empty_repo.index.add([os.path.join(dir_repo, "before.java")])
     list_commits_repo.append(empty_repo.index.commit("before"))
     empty_repo.index.add([os.path.join(dir_repo, file_name)])
@@ -54,16 +52,18 @@ def write_file():
                     with open(os.path.join(dir_repo, "after.java"), 'w', encoding="utf-8") as f:
                         f.writelines(current_contents)
                     apply_diffmin(dir_repo)
-                except:
+                except Exception as e:
+                    print(e)
                     pass
 
+
 if __name__ == '__main__':
-    window_size = 3
+    window_size = 2
     ind = int(sys.argv[1])
     commits_start = ind * window_size
     commits_end = commits_start + window_size
-    # repo_path = r"C:\Users\shirs\Downloads\commons-collections"
-    repo_path = r"local_repo"
+    repo_path = r"C:\Users\shirs\Downloads\commons-collections"
+    # repo_path = r"local_repo"
     all_commits = read_commit(repo_path)
     dir_repo = tempfile.mkdtemp()
     empty_repo = git.Repo.init(os.path.join(dir_repo, 'repo'))
