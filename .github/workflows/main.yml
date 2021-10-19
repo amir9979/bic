@@ -75,7 +75,8 @@ jobs:
         shell: python
         run: |
           import os
-          print(os.getenv("JAVA_HOME"))
+          print(os.getenv('JAVA_HOME'))
+          print(os.getenv('PATH'))
           
           
       - name: Checkout tools repo
@@ -114,7 +115,7 @@ jobs:
           
 
       - name: execute
-        run: python Main.py ${{ matrix.commit_ind }} #SyntheticExample.py
+        run: python SyntheticExample.py ${{ matrix.commit_ind }} #SyntheticExample.py Main.py
 
       - name: Upload data
         if: ${{ always() }}
