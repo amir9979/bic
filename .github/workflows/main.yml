@@ -61,10 +61,10 @@ jobs:
       
       
         
-      - uses: actions/setup-java@v2
-        with:
-          distribution: 'adopt' 
-          java-version: '11' #${{ matrix.java }}
+#       - uses: actions/setup-java@v2
+#         with:
+#           distribution: 'adopt' 
+#           java-version: '11' #${{ matrix.java }}
 
       - uses: actions/setup-java@v2
         with:
@@ -115,7 +115,7 @@ jobs:
           
 
       - name: execute
-        run: python SyntheticExample.py ${{ matrix.commit_ind }} #SyntheticExample.py Main.py
+        run: python Main.py ${{ matrix.commit_ind }} #SyntheticExample.py Main.py
 
       - name: Upload data
         if: ${{ always() }}
