@@ -79,8 +79,8 @@ if __name__ == '__main__':
         c = get_commit_diff(dir_repo, commit, analyze_diff=False)
         if c:
             metrics.extend(c.get_metrics())
+    print(metrics)
     pd.DataFrame(metrics).to_csv(f'./results/{ind}.csv', index=False)
-    # origin = empty_repo.remote(name='origin')
-    # origin.push()
+    # origin = empty_repo.remote(name='origin').push("master")
     if dir_repo:
         shutil.rmtree(dir_repo)
