@@ -24,8 +24,8 @@ def read_commit(repo_path):
 
 
 def apply_diffmin(path_to_dir):
-    # TODO jar
-    file = subprocess.check_output(["java", "-jar", r"externals/diffmin-1.0-SNAPSHOT-jar-with-dependencies.jar",
+    file = subprocess.check_output(["C:\hostedtoolcache\windows\Java_Adopt_jdk", "-v", "11.0.12-7", "--exec",
+                                    "java", "-jar", r"externals/diffmin-1.0-SNAPSHOT-jar-with-dependencies.jar",
                      os.path.join(path_to_dir, "before.java"), os.path.join(path_to_dir, "after.java")])
     with open(os.path.join(dir_repo, "new.java"), 'w', encoding="utf-8") as f:
         f.writelines(str(file))
@@ -33,6 +33,7 @@ def apply_diffmin(path_to_dir):
 
 
 def commit_to_repo(file_name):
+    # TODO check if this ok don't write before
     empty_repo.index.add([os.path.join(dir_repo, "before.java")])
     list_commits_repo.append(empty_repo.index.commit("before"))
     empty_repo.index.add([os.path.join(dir_repo, file_name)])
@@ -58,11 +59,12 @@ def write_file():
 
 
 if __name__ == '__main__':
-    window_size = 2
+    window_size = 1000
     ind = int(sys.argv[1])
     commits_start = ind * window_size
     commits_end = commits_start + window_size
-#     repo_path = r"C:\Users\shirs\Downloads\commons-collections"
+    # repo_path = r"C:\Users\shirs\Downloads\commons-collections"
+    # TODO: uncomment
     repo_path = r"local_repo"
     all_commits = read_commit(repo_path)
     dir_repo = tempfile.mkdtemp()
@@ -73,6 +75,7 @@ if __name__ == '__main__':
 
     metrics = []
     for commit in list_commits_repo:
+        # TODO: True
         c = get_commit_diff(dir_repo, commit, analyze_diff=True)
         if c:
             metrics.extend(c.get_metrics())
