@@ -68,18 +68,19 @@ if __name__ == '__main__':
     repo_path = r"local_repo"
     all_commits = read_commit(repo_path)
     dir_repo = tempfile.mkdtemp()
-    empty_repo = git.Repo.init(os.path.join(dir_repo, 'repo'))
-    dir_repo = dir_repo + r"\repo"
+    empty_repo = git.Repo.init(os.path.join(dir_repo, 'SyntheticExample'))
+    dir_repo = dir_repo + r"\SyntheticExample"
     list_commits_repo = []
     write_file()
 
     metrics = []
     for commit in list_commits_repo:
         # TODO: True
-        c = get_commit_diff(dir_repo, commit, analyze_diff=True)
+        c = get_commit_diff(dir_repo, commit, analyze_diff=False)
         if c:
             metrics.extend(c.get_metrics())
     pd.DataFrame(metrics).to_csv(f'./results/{ind}.csv', index=False)
-
+    # origin = empty_repo.remote(name='origin')
+    # origin.push()
     if dir_repo:
         shutil.rmtree(dir_repo)
