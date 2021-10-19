@@ -69,6 +69,7 @@ jobs:
           java-version: '8' #${{ matrix.java }}
           
       - name: java version
+        shell: python
         run: |
           import os
           print(os.getenv("JAVA_HOME"))
@@ -79,6 +80,7 @@ jobs:
           java-version: '11' #${{ matrix.java }}
        
       - name: java version
+        shell: python
         run: |
           import os
           print(os.getenv("JAVA_HOME"))
