@@ -114,7 +114,7 @@ jobs:
           
 
       - name: execute
-        run: python SyntheticExample.py ${{ matrix.commit_ind }} 
+        run: python bic.py ${{ matrix.commit_ind }} #SyntheticExample.py
 
       - name: Upload data
         if: ${{ always() }}
