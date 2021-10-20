@@ -24,9 +24,13 @@ def read_commit(repo_path):
 
 
 def apply_diffmin(path_to_dir):
+    # TODO: uncomment
     file = subprocess.check_output(["C:\hostedtoolcache\windows\Java_Adopt_jdk", "-v", "11.0.12-7", "--exec",
                                     "java", "-jar", r"externals/diffmin-1.0-SNAPSHOT-jar-with-dependencies.jar",
                      os.path.join(path_to_dir, "before.java"), os.path.join(path_to_dir, "after.java")])
+    # file = subprocess.check_output(["java", "-jar", r"externals/diffmin-1.0-SNAPSHOT-jar-with-dependencies.jar",
+    #                                 os.path.join(path_to_dir, "before.java"), os.path.join(path_to_dir, "after.java")])
+    print("s")
     with open(os.path.join(dir_repo, "new.java"), 'w', encoding="utf-8") as f:
         f.writelines(str(file))
     commit_to_repo("new.java")
@@ -38,6 +42,7 @@ def commit_to_repo(file_name):
     list_commits_repo.append(empty_repo.index.commit("before"))
     empty_repo.index.add([os.path.join(dir_repo, file_name)])
     list_commits_repo.append(empty_repo.index.commit("after"))
+    print("d")
 
 
 def write_file():
@@ -59,7 +64,7 @@ def write_file():
 
 
 if __name__ == '__main__':
-    window_size = 1000
+    window_size = 1
     ind = int(sys.argv[1])
     commits_start = ind * window_size
     commits_end = commits_start + window_size
@@ -79,8 +84,9 @@ if __name__ == '__main__':
         c = get_commit_diff(dir_repo, commit, analyze_diff=False)
         if c:
             metrics.extend(c.get_metrics())
-    print(metrics)
+    # print(metrics)
     pd.DataFrame(metrics).to_csv(f'./results/{ind}.csv', index=False)
-    # origin = empty_repo.remote(name='origin').push("master")
+    # empty_repo.create_remote('origin', 'https://github.com/shirshir05/SyntheticExample.git')
+    # empty_repo.remote("origin").push("master")
     if dir_repo:
         shutil.rmtree(dir_repo)
