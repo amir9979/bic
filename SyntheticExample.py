@@ -25,7 +25,8 @@ def read_commit(repo_path):
 
 def apply_diffmin(path_to_dir):
     # TODO: uncomment
-    file = subprocess.check_output(["C:\hostedtoolcache\windows\Java_Adopt_jdk", "-v", "11.0.12-7", "--exec",
+    # "C:\hostedtoolcache\windows\Java_Adopt_jdk", "-v", "11.0.12-7", "--exec",
+    file = subprocess.check_output([
                                     "java", "-jar", r"externals/diffmin-1.0-SNAPSHOT-jar-with-dependencies.jar",
                      os.path.join(path_to_dir, "before.java"), os.path.join(path_to_dir, "after.java")])
     # file = subprocess.check_output(["java", "-jar", r"externals/diffmin-1.0-SNAPSHOT-jar-with-dependencies.jar",
@@ -84,7 +85,7 @@ if __name__ == '__main__':
         c = get_commit_diff(dir_repo, commit, analyze_diff=False)
         if c:
             metrics.extend(c.get_metrics())
-    # print(metrics)
+    print(metrics)
     pd.DataFrame(metrics).to_csv(f'./results/{ind}.csv', index=False)
     # empty_repo.create_remote('origin', 'https://github.com/shirshir05/SyntheticExample.git')
     # empty_repo.remote("origin").push("master")
