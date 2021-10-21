@@ -33,9 +33,7 @@ def apply_diffmin(path_to_dir):
     #                                 os.path.join(path_to_dir, "before.java"), os.path.join(path_to_dir, "after.java")])
     with open(os.path.join(dir_repo, "new.java"), 'w', encoding="utf-8") as f:
         f.writelines(str(file))
-    print("run diffmin")
     commit_to_repo("new.java")
-    print("run commit")
 
 
 def java_by_env_var(env_var):
@@ -84,24 +82,29 @@ if __name__ == '__main__':
     commits_start = ind * window_size
     commits_end = commits_start + window_size
     # repo_path = r"C:\Users\shirs\Downloads\commons-collections"
+    # dir_repo = r"C:\Users\shirs\Desktop\SyntheticExample"
+
     # TODO: uncomment
     repo_path = r"local_repo"
-    all_commits = read_commit(repo_path)
+    # dir_repo = r"dir_repo"
     dir_repo = tempfile.mkdtemp()
+
+    all_commits = read_commit(repo_path)
     empty_repo = git.Repo.init(os.path.join(dir_repo, 'SyntheticExample'))
     dir_repo = dir_repo + r"\SyntheticExample"
+
+    # empty_repo = git.Repo(dir_repo)
+    # empty_repo.remote().pull('main')
     list_commits_repo = []
     write_file()
 
     metrics = []
     for commit in list_commits_repo:
-        # TODO: True
-        c = get_commit_diff(dir_repo, commit, analyze_diff=False)
+        c = get_commit_diff(dir_repo, commit, analyze_diff=True)
         if c:
             metrics.extend(c.get_metrics())
     print(metrics)
     pd.DataFrame(metrics).to_csv(f'./results/{ind}.csv', index=False)
-    # empty_repo.create_remote('origin', 'https://github.com/shirshir05/SyntheticExample.git')
-    # empty_repo.remote("origin").push("master")
-    if dir_repo:
-        shutil.rmtree(dir_repo)
+    # empty_repo.remote("origin").push("main")
+    # if dir_repo:
+    #     shutil.rmtree(dir_repo)
