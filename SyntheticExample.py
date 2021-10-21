@@ -25,16 +25,16 @@ def read_commit(repo_path):
 
 def apply_diffmin(path_to_dir):
     # TODO: uncomment
-    # "C:\hostedtoolcache\windows\Java_Adopt_jdk", "-v", "11.0.12-7", "--exec",
-    file = subprocess.check_output([
+    file = subprocess.check_output(["C:\hostedtoolcache\windows\Java_Adopt_jdk", "-v", "11.0.12-7", "--exec",
                                     "java", "-jar", r"externals/diffmin-1.0-SNAPSHOT-jar-with-dependencies.jar",
                      os.path.join(path_to_dir, "before.java"), os.path.join(path_to_dir, "after.java")])
     # file = subprocess.check_output(["java", "-jar", r"externals/diffmin-1.0-SNAPSHOT-jar-with-dependencies.jar",
     #                                 os.path.join(path_to_dir, "before.java"), os.path.join(path_to_dir, "after.java")])
-    print("s")
     with open(os.path.join(dir_repo, "new.java"), 'w', encoding="utf-8") as f:
         f.writelines(str(file))
+    print("run diffmin")
     commit_to_repo("new.java")
+    print("commit")
 
 
 def commit_to_repo(file_name):
@@ -43,7 +43,6 @@ def commit_to_repo(file_name):
     list_commits_repo.append(empty_repo.index.commit("before"))
     empty_repo.index.add([os.path.join(dir_repo, file_name)])
     list_commits_repo.append(empty_repo.index.commit("after"))
-    print("d")
 
 
 def write_file():
