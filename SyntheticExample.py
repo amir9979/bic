@@ -11,6 +11,18 @@ try:
 except:
     from javadiff.diff import get_commit_diff
 
+def java_by_env_var(env_var):
+    return os.path.join(os.environ[env_var], os.path.normpath('bin/java.exe'))
+
+
+def get_java_exe_by_version(version):
+    java_home = list(filter(lambda x: 'java_home' in x.lower(), os.environ.keys()))
+    java_home_version = list(filter(lambda x: f'_{version}_' in x.lower(), java_home))
+    if java_home_version:
+        return java_by_env_var(java_home_version[0])
+    if java_home:
+        return java_by_env_var('JAVA_HOME')
+    return 'java'
 
 def read_commit(repo_path):
     if type(repo_path) == type(''):
@@ -25,35 +37,20 @@ def read_commit(repo_path):
 
 def apply_diffmin(path_to_dir):
     # TODO: uncomment
-    # "C:\hostedtoolcache\windows\Java_Adopt_jdk", "-v", "11.0.12-7", "--exec",
-    file = subprocess.check_output([get_java_exe_by_version(11),
+    file = subprocess.Popen([get_java_exe_by_version(11),
                                     "-jar", r"externals/diffmin-1.0-SNAPSHOT-jar-with-dependencies.jar",
-                                    os.path.join(path_to_dir, "before.java"), os.path.join(path_to_dir, "after.java")])
-    # file = subprocess.check_output(["java", "java", "-jar", r"externals/diffmin-1.0-SNAPSHOT-jar-with-dependencies.jar",
-    #                                 os.path.join(path_to_dir, "before.java"), os.path.join(path_to_dir, "after.java")])
+                                    os.path.join(path_to_dir, "before.java"), os.path.join(path_to_dir, "after.java")],
+                            stdout=subprocess.PIPE, stderr = subprocess.STDOUT,encoding='utf8').communicate()[0].split("\n")[3:]
+    # file = subprocess.Popen(["java", "-jar", r"externals/diffmin-1.0-SNAPSHOT-jar-with-dependencies.jar", os.path.join(path_to_dir, "before.java"), os.path.join(path_to_dir, "after.java")], stdout=subprocess.PIPE, stderr = subprocess.STDOUT,
+    # encoding='utf8').communicate()[0].split("\n")[3:]
     with open(os.path.join(dir_repo, "new.java"), 'w', encoding="utf-8") as f:
-        f.writelines(str(file))
+        for i in file:
+            f.writelines(i)
+            f.writelines("\n")
     commit_to_repo("new.java")
 
 
-def java_by_env_var(env_var):
-    return os.path.join(os.environ[env_var], os.path.normpath('bin/java.exe'))
-
-
-def get_java_exe_by_version(version):
-    java_home = list(filter(lambda x: 'java_home' in x.lower(), os.environ.keys()))
-    java_home_version = list(filter(lambda x: f'_{version}_' in x.lower(), java_home))
-    if java_home_version:
-        return java_by_env_var(java_home_version[0])
-    if java_home:
-        return java_by_env_var('JAVA_HOME')
-    return 'java'
-
-
 def commit_to_repo(file_name):
-    # TODO check if this ok don't write before
-    empty_repo.index.add([os.path.join(dir_repo, "before.java")])
-    list_commits_repo.append(empty_repo.index.commit("before"))
     empty_repo.index.add([os.path.join(dir_repo, file_name)])
     list_commits_repo.append(empty_repo.index.commit("after"))
 
@@ -100,10 +97,10 @@ if __name__ == '__main__':
 
     metrics = []
     for commit in list_commits_repo:
+
         c = get_commit_diff(dir_repo, commit, analyze_diff=True)
         if c:
             metrics.extend(c.get_metrics())
-    print(metrics)
     pd.DataFrame(metrics).to_csv(f'./results/{ind}.csv', index=False)
     # empty_repo.remote("origin").push("main")
     # if dir_repo:
