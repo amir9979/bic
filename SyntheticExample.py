@@ -5,12 +5,14 @@ import tempfile
 import subprocess
 import git
 import pandas as pd
+from git import Repo
 
 try:
     from javadiff.javadiff.diff import get_commit_diff
 except:
     from javadiff.diff import get_commit_diff
 
+ID = 0
 def java_by_env_var(env_var):
     return os.path.join(os.environ[env_var], os.path.normpath('bin/java.exe'))
 
@@ -24,9 +26,12 @@ def get_java_exe_by_version(version):
         return java_by_env_var('JAVA_HOME')
     return 'java'
 
-def read_commit(repo_path):
+
+def read_commit(repo_path, flag=False):
     if type(repo_path) == type(''):
         repo = git.Repo(repo_path)
+    if flag:
+        return repo
     df = pd.read_csv("TrainSet/train.csv")
     commits = df["commit"]
     commits_object = []
@@ -37,21 +42,26 @@ def read_commit(repo_path):
 
 def apply_diffmin(path_to_dir):
     # TODO: uncomment
-    file = subprocess.Popen([get_java_exe_by_version(11),
-                                    "-jar", r"externals/diffmin-1.0-SNAPSHOT-jar-with-dependencies.jar",
-                                    os.path.join(path_to_dir, "before.java"), os.path.join(path_to_dir, "after.java")],
-                            stdout=subprocess.PIPE, stderr = subprocess.STDOUT,encoding='utf8').communicate()[0].split("\n")[3:]
-    # file = subprocess.Popen(["java", "-jar", r"externals/diffmin-1.0-SNAPSHOT-jar-with-dependencies.jar", os.path.join(path_to_dir, "before.java"), os.path.join(path_to_dir, "after.java")], stdout=subprocess.PIPE, stderr = subprocess.STDOUT,
-    # encoding='utf8').communicate()[0].split("\n")[3:]
-    with open(os.path.join(dir_repo, "new.java"), 'w', encoding="utf-8") as f:
+    global ID
+
+    # file = subprocess.Popen([get_java_exe_by_version(11),
+    #                                 "-jar", r"externals/diffmin-1.0-SNAPSHOT-jar-with-dependencies.jar",
+    #                                 os.path.join(path_to_dir,  f"{ID}.java"), os.path.join(path_to_dir, "after.java")],
+    #                         stdout=subprocess.PIPE, stderr = subprocess.STDOUT,encoding='utf8').communicate()[0].split("\n")[3:]
+    file = subprocess.Popen(["java", "-jar", r"externals/diffmin-1.0-SNAPSHOT-jar-with-dependencies.jar",
+                             os.path.join(path_to_dir, f"{ID}.java"), os.path.join(path_to_dir, "after.java")],
+                            stdout=subprocess.PIPE, stderr=subprocess.STDOUT,
+                            encoding='utf8').communicate()[0].split("\n")[3:]
+    with open(os.path.join(dir_repo, f"{ID}.java"), 'w', encoding="utf-8") as f:
         for i in file:
             f.writelines(i)
             f.writelines("\n")
-    commit_to_repo("new.java")
+    commit_to_repo()
 
 
-def commit_to_repo(file_name):
-    empty_repo.index.add([os.path.join(dir_repo, file_name)])
+def commit_to_repo():
+    global ID
+    empty_repo.index.add([os.path.join(dir_repo, f"{ID}.java")])
     list_commits_repo.append(empty_repo.index.commit("after"))
 
 
@@ -61,13 +71,17 @@ def write_file():
             diff_index = parent.diff(commit)
             for diff in diff_index:
                 try:
+                    global ID
                     parent_contents = diff.a_blob.data_stream.read().decode('utf-8')
                     current_contents = diff.b_blob.data_stream.read().decode('utf-8')
-                    with open(os.path.join(dir_repo, "before.java"), 'w', encoding="utf-8") as f:
+                    with open(os.path.join(dir_repo, f"{ID}.java"), 'w', encoding="utf-8") as f:
                         f.writelines(parent_contents)
+                    empty_repo.index.add([os.path.join(dir_repo, f"{ID}.java")])
+                    list_commits_repo.append(empty_repo.index.commit("before"))
                     with open(os.path.join(dir_repo, "after.java"), 'w', encoding="utf-8") as f:
                         f.writelines(current_contents)
                     apply_diffmin(dir_repo)
+                    ID += 1
                 except Exception as e:
                     print(e)
                     pass
@@ -78,30 +92,31 @@ if __name__ == '__main__':
     ind = int(sys.argv[1])
     commits_start = ind * window_size
     commits_end = commits_start + window_size
-    # repo_path = r"C:\Users\shirs\Downloads\commons-collections"
-    # dir_repo = r"C:\Users\shirs\Desktop\SyntheticExample"
 
     # TODO: uncomment
+    # repo_path = r"C:\Users\shirs\Desktop\JAVA_SECGAN"
     repo_path = r"local_repo"
-    # dir_repo = r"dir_repo"
+
     dir_repo = tempfile.mkdtemp()
+    empty_repo = Repo.clone_from("https://github.com/shirshir05/SyntheticExample.git", dir_repo)
+    empty_repo.remote().pull('main')
 
-    all_commits = read_commit(repo_path)
-    empty_repo = git.Repo.init(os.path.join(dir_repo, 'SyntheticExample'))
-    dir_repo = dir_repo + r"\SyntheticExample"
+    # TODO: uncomment
+    all_commits = read_commit(repo_path, True)
+    if not isinstance(type(all_commits), list):
+        all_commits = list(all_commits.iter_commits('HEAD'))
 
-    # empty_repo = git.Repo(dir_repo)
-    # empty_repo.remote().pull('main')
     list_commits_repo = []
     write_file()
 
     metrics = []
     for commit in list_commits_repo:
-
-        c = get_commit_diff(dir_repo, commit, analyze_diff=True)
+        c = get_commit_diff(dir_repo, commit, analyze_diff=False)
         if c:
             metrics.extend(c.get_metrics())
     pd.DataFrame(metrics).to_csv(f'./results/{ind}.csv', index=False)
-    # empty_repo.remote("origin").push("main")
+    print("write")
+    empty_repo.remote(name="origin").push("main")
+    print("s")
     # if dir_repo:
     #     shutil.rmtree(dir_repo)
