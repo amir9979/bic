@@ -41,17 +41,17 @@ def read_commit(repo_path, flag=False):
 
 
 def apply_diffmin(path_to_dir):
-    # TODO: uncomment
     global ID
 
-    # file = subprocess.Popen([get_java_exe_by_version(11),
-    #                                 "-jar", r"externals/diffmin-1.0-SNAPSHOT-jar-with-dependencies.jar",
-    #                                 os.path.join(path_to_dir,  f"{ID}.java"), os.path.join(path_to_dir, "after.java")],
-    #                         stdout=subprocess.PIPE, stderr = subprocess.STDOUT,encoding='utf8').communicate()[0].split("\n")[3:]
-    file = subprocess.Popen(["java", "-jar", r"externals/diffmin-1.0-SNAPSHOT-jar-with-dependencies.jar",
-                             os.path.join(path_to_dir, f"{ID}.java"), os.path.join(path_to_dir, "after.java")],
-                            stdout=subprocess.PIPE, stderr=subprocess.STDOUT,
-                            encoding='utf8').communicate()[0].split("\n")[3:]
+    # TODO: uncomment
+    file = subprocess.Popen([get_java_exe_by_version(11),
+                                    "-jar", r"externals/diffmin-1.0-SNAPSHOT-jar-with-dependencies.jar",
+                                    os.path.join(path_to_dir,  f"{ID}.java"), os.path.join(path_to_dir, "after.java")],
+                            stdout=subprocess.PIPE, stderr = subprocess.STDOUT,encoding='utf8').communicate()[0].split("\n")[3:]
+    # file = subprocess.Popen(["java", "-jar", r"externals/diffmin-1.0-SNAPSHOT-jar-with-dependencies.jar",
+    #                          os.path.join(path_to_dir, f"{ID}.java"), os.path.join(path_to_dir, "after.java")],
+    #                         stdout=subprocess.PIPE, stderr=subprocess.STDOUT,
+    #                         encoding='utf8').communicate()[0].split("\n")[3:]
     with open(os.path.join(dir_repo, f"{ID}.java"), 'w', encoding="utf-8") as f:
         for i in file:
             f.writelines(i)
@@ -101,7 +101,6 @@ if __name__ == '__main__':
     empty_repo = Repo.clone_from("https://github.com/shirshir05/SyntheticExample.git", dir_repo)
     empty_repo.remote().pull('main')
 
-    # TODO: uncomment
     all_commits = read_commit(repo_path, True)
     if not isinstance(type(all_commits), list):
         all_commits = list(all_commits.iter_commits('HEAD'))
@@ -111,12 +110,12 @@ if __name__ == '__main__':
 
     metrics = []
     for commit in list_commits_repo:
-        c = get_commit_diff(dir_repo, commit, analyze_diff=False)
+        c = get_commit_diff(dir_repo, commit, analyze_diff=True)
         if c:
             metrics.extend(c.get_metrics())
     pd.DataFrame(metrics).to_csv(f'./results/{ind}.csv', index=False)
     print("write")
     empty_repo.remote(name="origin").push("main")
     print("s")
-    # if dir_repo:
-    #     shutil.rmtree(dir_repo)
+    if dir_repo:
+        shutil.rmtree(dir_repo)
