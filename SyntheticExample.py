@@ -48,10 +48,12 @@ def apply_diffmin(path_to_dir):
                                     "-jar", r"externals/diffmin-1.0-SNAPSHOT-jar-with-dependencies.jar",
                                     os.path.join(path_to_dir,  f"{ID}.java"), os.path.join(path_to_dir, "after.java")],
                             stdout=subprocess.PIPE, stderr = subprocess.STDOUT,encoding='utf8').communicate()[0].split("\n")[3:]
+
     # file = subprocess.Popen(["java", "-jar", r"externals/diffmin-1.0-SNAPSHOT-jar-with-dependencies.jar",
     #                          os.path.join(path_to_dir, f"{ID}.java"), os.path.join(path_to_dir, "after.java")],
     #                         stdout=subprocess.PIPE, stderr=subprocess.STDOUT,
     #                         encoding='utf8').communicate()[0].split("\n")[3:]
+
     with open(os.path.join(dir_repo, f"{ID}.java"), 'w', encoding="utf-8") as f:
         for i in file:
             f.writelines(i)
@@ -98,7 +100,8 @@ if __name__ == '__main__':
     repo_path = r"local_repo"
 
     dir_repo = tempfile.mkdtemp()
-    empty_repo = Repo.clone_from("https://github.com/shirshir05/SyntheticExample.git", dir_repo)
+    empty_repo = Repo.clone_from("https://github.com/shirshir05/SyntheticExample.git", dir_repo,branch='main',
+                                 recursive=True)
     empty_repo.remote().pull('main')
 
     all_commits = read_commit(repo_path, True)
@@ -110,12 +113,11 @@ if __name__ == '__main__':
 
     metrics = []
     for commit in list_commits_repo:
-        c = get_commit_diff(dir_repo, commit, analyze_diff=True)
+        c = get_commit_diff(dir_repo, commit, analyze_diff=False)
         if c:
             metrics.extend(c.get_metrics())
     pd.DataFrame(metrics).to_csv(f'./results/{ind}.csv', index=False)
-    print("write")
-    empty_repo.remote(name="origin").push("main")
-    print("s")
+    # empty_repo.remote(name="origin").push("main")
+    empty_repo.remotes.origin.push()
     if dir_repo:
         shutil.rmtree(dir_repo)
