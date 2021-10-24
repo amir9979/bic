@@ -68,25 +68,27 @@ def commit_to_repo():
 
 
 def write_file():
+    global ID
     for commit in all_commits:
         for parent in commit.parents:
             diff_index = parent.diff(commit)
             for diff in diff_index:
                 try:
-                    global ID
                     parent_contents = diff.a_blob.data_stream.read().decode('utf-8')
                     current_contents = diff.b_blob.data_stream.read().decode('utf-8')
                     with open(os.path.join(dir_repo, f"{ID}.java"), 'w', encoding="utf-8") as f:
                         f.writelines(parent_contents)
-                    empty_repo.index.add([os.path.join(dir_repo, f"{ID}.java")])
-                    list_commits_repo.append(empty_repo.index.commit("before"))
+                    # empty_repo.index.add([os.path.join(dir_repo, f"{ID}.java")])
+                    # list_commits_repo.append(empty_repo.index.commit("before"))
                     with open(os.path.join(dir_repo, "after.java"), 'w', encoding="utf-8") as f:
                         f.writelines(current_contents)
                     apply_diffmin(dir_repo)
-                    ID += 1
                 except Exception as e:
                     print(e)
                     pass
+                finally:
+                    ID += 1
+
 
 
 if __name__ == '__main__':
@@ -100,10 +102,9 @@ if __name__ == '__main__':
     # dir_repo = tempfile.mkdtemp()
 
     repo_path = r"local_repo"
-    dir_repo = "./SyntheticExample"
+    dir_repo = "./"
 
-    empty_repo = Repo.clone_from("https://github.com/shirshir05/SyntheticExample.git", dir_repo,branch='main',
-                                 recursive=True)
+    empty_repo = Repo.clone_from("https://github.com/shirshir05/SyntheticExample.git", dir_repo, branch='main')
     empty_repo.remote().pull('main')
 
     all_commits = read_commit(repo_path, True)
