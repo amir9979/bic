@@ -130,8 +130,6 @@ jobs:
         env:
           GITHUB_TOKEN: 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
         run: |
-#          git config user.email "shirshir05@walla.co.il"
-#          git config user.name "shirshir05"
           cd ./SyntheticExample
           git remote set-url origin https://x-access-token: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@github.com/SyntheticExample.git
           echo "foo" >> file.txt
