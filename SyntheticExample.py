@@ -97,9 +97,11 @@ if __name__ == '__main__':
 
     # TODO: uncomment
     # repo_path = r"C:\Users\shirs\Desktop\JAVA_SECGAN"
-    repo_path = r"local_repo"
+    # dir_repo = tempfile.mkdtemp()
 
-    dir_repo = tempfile.mkdtemp()
+    repo_path = r"local_repo"
+    dir_repo = "./SyntheticExample"
+
     empty_repo = Repo.clone_from("https://github.com/shirshir05/SyntheticExample.git", dir_repo,branch='main',
                                  recursive=True)
     empty_repo.remote().pull('main')
@@ -118,6 +120,5 @@ if __name__ == '__main__':
             metrics.extend(c.get_metrics())
     pd.DataFrame(metrics).to_csv(f'./results/{ind}.csv', index=False)
     # empty_repo.remote(name="origin").push("main")
-    empty_repo.remotes.origin.push()
     if dir_repo:
         shutil.rmtree(dir_repo)
