@@ -126,16 +126,16 @@ jobs:
           # A file, directory or wildcard pattern that describes what to upload
           path: ./results
 
-      - name: push repo
-        env:
-          GITHUB_TOKEN: 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
-        run: |
-          cd ./SyntheticExample
-          git remote set-url origin https://x-access-token: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@github.com/SyntheticExample.git
-          echo "foo" >> file.txt
-          git add file.txt
-          git commit -m "Some commit message"
-          git push origin master
+#      - name: push repo
+#        env:
+#          GITHUB_TOKEN: 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
+#        run: |
+#          cd ./SyntheticExample
+#          git remote set-url origin https://x-access-token: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@github.com/SyntheticExample.git
+#          echo "foo" >> file.txt
+#          git add file.txt
+#          git commit -m "Some commit message"
+#          git push origin master
 
   aggregate:
       # The type of runner that the job will run on

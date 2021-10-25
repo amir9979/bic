@@ -13,6 +13,8 @@ except:
     from javadiff.diff import get_commit_diff
 
 ID = 0
+
+
 def java_by_env_var(env_var):
     return os.path.join(os.environ[env_var], os.path.normpath('bin/java.exe'))
 
@@ -45,9 +47,10 @@ def apply_diffmin(path_to_dir):
 
     # TODO: uncomment
     file = subprocess.Popen([get_java_exe_by_version(11),
-                                    "-jar", r"externals/diffmin-1.0-SNAPSHOT-jar-with-dependencies.jar",
-                                    os.path.join(path_to_dir,  f"{ID}.java"), os.path.join(path_to_dir, "after.java")],
-                            stdout=subprocess.PIPE, stderr = subprocess.STDOUT,encoding='utf8').communicate()[0].split("\n")[3:]
+                             "-jar", r"externals/diffmin-1.0-SNAPSHOT-jar-with-dependencies.jar",
+                             os.path.join(path_to_dir, f"{ID}.java"), os.path.join(path_to_dir, "after.java")],
+                            stdout=subprocess.PIPE, stderr=subprocess.STDOUT, encoding='utf8').communicate()[0].split(
+        "\n")[3:]
 
     # file = subprocess.Popen(["java", "-jar", r"externals/diffmin-1.0-SNAPSHOT-jar-with-dependencies.jar",
     #                          os.path.join(path_to_dir, f"{ID}.java"), os.path.join(path_to_dir, "after.java")],
@@ -90,7 +93,6 @@ def write_file():
                     ID += 1
 
 
-
 if __name__ == '__main__':
     window_size = 1
     ind = int(sys.argv[1])
@@ -98,6 +100,7 @@ if __name__ == '__main__':
     commits_end = commits_start + window_size
 
     # TODO: uncomment
+    # repo_path = r"C:\Users\shirs\Downloads\commons-collections"
     # repo_path = r"C:\Users\shirs\Desktop\JAVA_SECGAN"
     # dir_repo = tempfile.mkdtemp() + "/SyntheticExample"
 
@@ -108,7 +111,7 @@ if __name__ == '__main__':
     empty_repo.remote().pull('main')
 
     all_commits = read_commit(repo_path, True)
-    if not isinstance(type(all_commits), list):
+    if type(all_commits) != list:
         all_commits = list(all_commits.iter_commits('HEAD'))
 
     list_commits_repo = []
@@ -120,6 +123,8 @@ if __name__ == '__main__':
         if c:
             metrics.extend(c.get_metrics())
     pd.DataFrame(metrics).to_csv(f'./results/{ind}.csv', index=False)
+    empty_repo.git.push("--set-upstream", "origin", "main")
+    print("s")
     # empty_repo.remote(name="origin").push("main")
-    if dir_repo:
-        shutil.rmtree(dir_repo)
+    # if dir_repo:
+    #     shutil.rmtree(dir_repo)
