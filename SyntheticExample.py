@@ -102,7 +102,7 @@ if __name__ == '__main__':
     # dir_repo = tempfile.mkdtemp()
 
     repo_path = r"local_repo"
-    dir_repo = "./"
+    dir_repo = "./SyntheticExample"
 
     empty_repo = Repo.clone_from("https://github.com/shirshir05/SyntheticExample.git", dir_repo, branch='main')
     empty_repo.remote().pull('main')
