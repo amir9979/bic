@@ -63,7 +63,7 @@ def apply_diffmin(path_to_dir):
 
 def commit_to_repo():
     global ID
-    empty_repo.index.add([os.path.join(dir_repo, f"{ID}.java")])
+    empty_repo.index.add([os.path.join(f"{ID}.java")])
     list_commits_repo.append(empty_repo.index.commit("after"))
 
 
@@ -78,7 +78,7 @@ def write_file():
                     current_contents = diff.b_blob.data_stream.read().decode('utf-8')
                     with open(os.path.join(dir_repo, f"{ID}.java"), 'w', encoding="utf-8") as f:
                         f.writelines(parent_contents)
-                    # empty_repo.index.add([os.path.join(dir_repo, f"{ID}.java")])
+                    # empty_repo.index.add([os.path.join(f"{ID}.java")])
                     # list_commits_repo.append(empty_repo.index.commit("before"))
                     with open(os.path.join(dir_repo, "after.java"), 'w', encoding="utf-8") as f:
                         f.writelines(current_contents)
@@ -99,7 +99,7 @@ if __name__ == '__main__':
 
     # TODO: uncomment
     # repo_path = r"C:\Users\shirs\Desktop\JAVA_SECGAN"
-    # dir_repo = tempfile.mkdtemp()
+    # dir_repo = tempfile.mkdtemp() + "/SyntheticExample"
 
     repo_path = r"local_repo"
     dir_repo = "./SyntheticExample"
