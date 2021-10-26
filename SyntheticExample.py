@@ -123,7 +123,7 @@ if __name__ == '__main__':
         if c:
             metrics.extend(c.get_metrics())
     pd.DataFrame(metrics).to_csv(f'./results/{ind}.csv', index=False)
-    empty_repo.git.push("--set-upstream", "origin", "main")
+#     empty_repo.git.push("--set-upstream", "origin", "main")
     print("s")
     # empty_repo.remote(name="origin").push("main")
     # if dir_repo:
