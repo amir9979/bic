@@ -81,8 +81,8 @@ def write_file():
                     current_contents = diff.b_blob.data_stream.read().decode('utf-8')
                     with open(os.path.join(dir_repo, f"{ID}.java"), 'w', encoding="utf-8") as f:
                         f.writelines(parent_contents)
-                    # empty_repo.index.add([os.path.join(f"{ID}.java")])
-                    # list_commits_repo.append(empty_repo.index.commit("before"))
+                    empty_repo.index.add([os.path.join(f"{ID}.java")])
+                    list_commits_repo.append(empty_repo.index.commit("before"))
                     with open(os.path.join(dir_repo, "after.java"), 'w', encoding="utf-8") as f:
                         f.writelines(current_contents)
                     apply_diffmin(dir_repo)
