@@ -194,7 +194,14 @@ jobs:
             name: all_data
             # A file, directory or wildcard pattern that describes what to upload
             path: ./results/all.csv
-        
+            
+        - name: Upload data repo
+          if: ${{ always() }}
+          uses: actions/upload-artifact@v2
+          with:
+            name: repo
+            path: ./SyntheticExample
+            
 #         - uses: geekyeggo/delete-artifact@v1
 #           with:
 #             name: results
