@@ -200,7 +200,7 @@ jobs:
           uses: actions/upload-artifact@v2
           with:
             name: repo
-            path: ./SyntheticExample
+            path: ./SyntheticExample/
             
 #         - uses: geekyeggo/delete-artifact@v1
 #           with:
