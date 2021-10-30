@@ -57,7 +57,7 @@ def apply_diffmin(path_to_dir):
     #                         stdout=subprocess.PIPE, stderr=subprocess.STDOUT,
     #                         encoding='utf8').communicate()[0].split("\n")[3:]
 
-    with open(os.path.join(dir_repo, f"{ID}.java"), 'w', encoding="utf-8") as f:
+    with open(os.path.join(dir_repo, f"{ID}_after.java"), 'w', encoding="utf-8") as f:
         for i in file:
             f.writelines(i)
             f.writelines("\n")
@@ -66,8 +66,9 @@ def apply_diffmin(path_to_dir):
 
 def commit_to_repo():
     global ID
-    empty_repo.index.add([os.path.join(f"{ID}.java")])
+    empty_repo.index.add([os.path.join(f"{ID}_after.java")])
     list_commits_repo.append(empty_repo.index.commit("after"))
+    print(f"for commit {list_commits_repo[-1]} the parent is {list_commits_repo[-1].parents}")
 
 
 def write_file():
@@ -119,7 +120,7 @@ if __name__ == '__main__':
 
     metrics = []
     for commit in list_commits_repo:
-        c = get_commit_diff(dir_repo, commit, analyze_diff=False)
+        c = get_commit_diff(dir_repo, commit, analyze_diff=True)
         if c:
             metrics.extend(c.get_metrics())
     pd.DataFrame(metrics).to_csv(f'./results/{ind}.csv', index=False)
