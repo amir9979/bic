@@ -95,7 +95,7 @@ def write_file():
 
 
 if __name__ == '__main__':
-    window_size = 3
+    window_size = 1
     ind = int(sys.argv[1])
     commits_start = ind * window_size
     commits_end = commits_start + window_size
