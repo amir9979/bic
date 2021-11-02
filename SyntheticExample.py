@@ -59,8 +59,8 @@ def apply_diffmin(path_to_dir):
     check_error = [i for i in file if "(Unknown Source)" in i]
     if "Exception in thread" not in file[0] and len(check_error) == 0:
         empty_repo.index.add([os.path.join(f"{ID}.java")])
-        empty_repo.index.commit("before")
-        # list_commits_repo.append()
+
+        list_commits_repo.append(empty_repo.index.commit("before"))
         with open(os.path.join(dir_repo, f"{ID}.java"), 'w', encoding="utf-8") as f:
             for i in file:
                 f.writelines(i)
