@@ -118,12 +118,14 @@ if __name__ == '__main__':
     list_commits_repo = []
     write_file()
 
-    # metrics = []
-    # for commit in list_commits_repo:
-    #     c = get_commit_diff(dir_repo, commit, analyze_diff=False)
-    #     if c:
-    #         metrics.extend(c.get_metrics())
-    # pd.DataFrame(metrics).to_csv(f'./results/{ind}.csv', index=False)
+    metrics = []
+    for commit in list_commits_repo:
+        c = get_commit_diff(dir_repo, commit, analyze_diff=False)
+        print("here")
+        if c:
+            metrics.extend(c.get_metrics())
+             print("here 2")
+    pd.DataFrame(metrics).to_csv(f'./results/{ind}.csv', index=False)
 #     empty_repo.git.push("--set-upstream", "origin", "main")
     print("s")
     # empty_repo.remote(name="origin").push("main")
