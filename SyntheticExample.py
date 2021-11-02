@@ -46,29 +46,34 @@ def apply_diffmin(path_to_dir):
     global ID
 
     # TODO: uncomment
-    file = subprocess.Popen([get_java_exe_by_version(11),
-                             "-jar", r"externals/diffmin-1.0-SNAPSHOT-jar-with-dependencies.jar",
-                             os.path.join(path_to_dir, f"{ID}.java"), os.path.join(path_to_dir, "after.java")],
-                            stdout=subprocess.PIPE, stderr=subprocess.STDOUT, encoding='utf8').communicate()[0].split(
-        "\n")[3:]
-
-    # file = subprocess.Popen(["java", "-jar", r"externals/diffmin-1.0-SNAPSHOT-jar-with-dependencies.jar",
+    # file = subprocess.Popen([get_java_exe_by_version(11),
+    #                          "-jar", r"externals/diffmin-1.0-SNAPSHOT-jar-with-dependencies.jar",
     #                          os.path.join(path_to_dir, f"{ID}.java"), os.path.join(path_to_dir, "after.java")],
-    #                         stdout=subprocess.PIPE, stderr=subprocess.STDOUT,
-    #                         encoding='utf8').communicate()[0].split("\n")[3:]
+    #                         stdout=subprocess.PIPE, stderr=subprocess.STDOUT, encoding='utf8').communicate()[0].split(
+    #     "\n")[3:]
 
-    with open(os.path.join(dir_repo, f"{ID}_after.java"), 'w', encoding="utf-8") as f:
-        for i in file:
-            f.writelines(i)
-            f.writelines("\n")
-    commit_to_repo()
+    file = subprocess.Popen(["java", "-jar", r"externals/diffmin-1.0-SNAPSHOT-jar-with-dependencies.jar",
+                             os.path.join(path_to_dir, f"{ID}.java"), os.path.join(path_to_dir, "after.java")],
+                            stdout=subprocess.PIPE, stderr=subprocess.STDOUT,
+                            encoding='utf8').communicate()[0].split("\n")[3:]
+    check_error = [i for i in file if "(Unknown Source)" in i]
+    if "Exception in thread" not in file[0] and len(check_error) == 0:
+        empty_repo.index.add([os.path.join(f"{ID}.java")])
+        empty_repo.index.commit("before")
+        # list_commits_repo.append()
+        with open(os.path.join(dir_repo, f"{ID}.java"), 'w', encoding="utf-8") as f:
+            for i in file:
+                f.writelines(i)
+                f.writelines("\n")
+        commit_to_repo()
 
 
 def commit_to_repo():
     global ID
-    empty_repo.index.add([os.path.join(f"{ID}_after.java")])
+    # empty_repo.index.add([os.path.join(f"{ID}_after.java")])
+    empty_repo.git.add([os.path.join(f"{ID}.java")])
     list_commits_repo.append(empty_repo.index.commit("after"))
-    print(f"for commit {list_commits_repo[-1]} the parent is {list_commits_repo[-1].parents}")
+    print(f" For {list_commits_repo[-1]} is parent {list_commits_repo[-1].parents[0]} ")
 
 
 def write_file():
@@ -82,8 +87,6 @@ def write_file():
                     current_contents = diff.b_blob.data_stream.read().decode('utf-8')
                     with open(os.path.join(dir_repo, f"{ID}.java"), 'w', encoding="utf-8") as f:
                         f.writelines(parent_contents)
-                    empty_repo.index.add([os.path.join(f"{ID}.java")])
-                    list_commits_repo.append(empty_repo.index.commit("before"))
                     with open(os.path.join(dir_repo, "after.java"), 'w', encoding="utf-8") as f:
                         f.writelines(current_contents)
                     apply_diffmin(dir_repo)
@@ -118,12 +121,13 @@ if __name__ == '__main__':
     list_commits_repo = []
     write_file()
 
-    # metrics = []
-    # for commit in list_commits_repo:
-    #     c = get_commit_diff(dir_repo, commit, analyze_diff=False)
-    #     if c:
-    #         metrics.extend(c.get_metrics())
-    # pd.DataFrame(metrics).to_csv(f'./results/{ind}.csv', index=False)
+    metrics = []
+    for commit in list_commits_repo:
+        c = get_commit_diff(dir_repo, commit, analyze_diff=False)
+        if c:
+            metrics.extend(c.get_metrics())
+    pd.DataFrame(metrics).to_csv(f'./results/{ind}.csv', index=False)
+
 #     empty_repo.git.push("--set-upstream", "origin", "main")
     print("s")
     # empty_repo.remote(name="origin").push("main")
