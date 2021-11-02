@@ -46,16 +46,16 @@ def apply_diffmin(path_to_dir):
     global ID
 
     # TODO: uncomment
-    # file = subprocess.Popen([get_java_exe_by_version(11),
-    #                          "-jar", r"externals/diffmin-1.0-SNAPSHOT-jar-with-dependencies.jar",
-    #                          os.path.join(path_to_dir, f"{ID}.java"), os.path.join(path_to_dir, "after.java")],
-    #                         stdout=subprocess.PIPE, stderr=subprocess.STDOUT, encoding='utf8').communicate()[0].split(
-    #     "\n")[3:]
-
-    file = subprocess.Popen(["java", "-jar", r"externals/diffmin-1.0-SNAPSHOT-jar-with-dependencies.jar",
+    file = subprocess.Popen([get_java_exe_by_version(11),
+                             "-jar", r"externals/diffmin-1.0-SNAPSHOT-jar-with-dependencies.jar",
                              os.path.join(path_to_dir, f"{ID}.java"), os.path.join(path_to_dir, "after.java")],
-                            stdout=subprocess.PIPE, stderr=subprocess.STDOUT,
-                            encoding='utf8').communicate()[0].split("\n")[3:]
+                            stdout=subprocess.PIPE, stderr=subprocess.STDOUT, encoding='utf8').communicate()[0].split(
+        "\n")[3:]
+
+    # file = subprocess.Popen(["java", "-jar", r"externals/diffmin-1.0-SNAPSHOT-jar-with-dependencies.jar",
+    #                          os.path.join(path_to_dir, f"{ID}.java"), os.path.join(path_to_dir, "after.java")],
+    #                         stdout=subprocess.PIPE, stderr=subprocess.STDOUT,
+    #                         encoding='utf8').communicate()[0].split("\n")[3:]
     check_error = [i for i in file if "(Unknown Source)" in i]
     if "Exception in thread" not in file[0] and len(check_error) == 0:
         empty_repo.index.add([os.path.join(f"{ID}.java")])
@@ -123,7 +123,7 @@ if __name__ == '__main__':
 
     metrics = []
     for commit in list_commits_repo:
-        c = get_commit_diff(dir_repo, commit, analyze_diff=False)
+        c = get_commit_diff(dir_repo, commit, analyze_diff=True)
         if c:
             metrics.extend(c.get_metrics())
     pd.DataFrame(metrics).to_csv(f'./results/{ind}.csv', index=False)
