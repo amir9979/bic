@@ -120,8 +120,9 @@ if __name__ == '__main__':
 
     metrics = []
     for commit in list_commits_repo:
+        print("here 0")
         c = get_commit_diff(dir_repo, commit, analyze_diff=False)
-        print("here")
+        print("here 1")
         if c:
             metrics.extend(c.get_metrics())
              print("here 2")
