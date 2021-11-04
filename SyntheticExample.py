@@ -59,9 +59,19 @@ def apply_diffmin(path_to_dir):
     check_error = [i for i in file if "(Unknown Source)" in i]
     if "Exception in thread" not in file[0] and len(check_error) == 0:
         empty_repo.index.add([os.path.join(f"{ID}.java")])
+        empty_repo.index.commit("before")  # parent commit
+        print(f"Parent {empty_repo.commit()}")
+        empty_repo.git.stash('push')
 
-        list_commits_repo.append(empty_repo.index.commit("before"))
-        with open(os.path.join(dir_repo, f"{ID}.java"), 'w', encoding="utf-8") as f:
+        open(os.path.join(dir_repo, f"{ID}.java"), "w").writelines(
+            [l for l in open(os.path.join(dir_repo, f"after.java")).readlines()])
+        empty_repo.git.add([os.path.join(f"{ID}.java")])
+        list_commits_repo.append(empty_repo.index.commit("after"))  # the real after  # todo: remove from the list after check
+        print(f"After {empty_repo.commit()}")
+        empty_repo.git.stash('push')
+
+        empty_repo.git.checkout(list_commits_repo[-1].parents[0].hexsha)  # change to parent commit
+        with open(os.path.join(path_to_dir, f"{ID}.java"), 'w', encoding="utf-8") as f:
             for i in file:
                 f.writelines(i)
                 f.writelines("\n")
@@ -70,10 +80,12 @@ def apply_diffmin(path_to_dir):
 
 def commit_to_repo():
     global ID
-    # empty_repo.index.add([os.path.join(f"{ID}_after.java")])
+
     empty_repo.git.add([os.path.join(f"{ID}.java")])
-    list_commits_repo.append(empty_repo.index.commit("after"))
-    print(f" For {list_commits_repo[-1]} is parent {list_commits_repo[-1].parents[0]} ")
+    list_commits_repo.append(empty_repo.index.commit("after diffmin"))  # from diffmin commit
+    print(f"After diff {empty_repo.commit()}")
+    empty_repo.git.stash('push')
+    print(ID)
 
 
 def write_file():
@@ -82,19 +94,22 @@ def write_file():
         for parent in commit.parents:
             diff_index = parent.diff(commit)
             for diff in diff_index:
-                try:
-                    parent_contents = diff.a_blob.data_stream.read().decode('utf-8')
-                    current_contents = diff.b_blob.data_stream.read().decode('utf-8')
-                    with open(os.path.join(dir_repo, f"{ID}.java"), 'w', encoding="utf-8") as f:
-                        f.writelines(parent_contents)
-                    with open(os.path.join(dir_repo, "after.java"), 'w', encoding="utf-8") as f:
-                        f.writelines(current_contents)
-                    apply_diffmin(dir_repo)
-                except Exception as e:
-                    print(e)
-                    pass
-                finally:
-                    ID += 1
+                if ID > 50:
+                    return
+                if diff.a_path.endswith(".java") and not diff.a_path.lower().endswith("test.java"):
+                    try:
+                        parent_contents = diff.a_blob.data_stream.read().decode('utf-8')
+                        current_contents = diff.b_blob.data_stream.read().decode('utf-8')
+                        with open(os.path.join(dir_repo, f"{ID}.java"), 'w', encoding="utf-8") as f:
+                            f.writelines(parent_contents)
+                        with open(os.path.join(dir_repo, "after.java"), 'w', encoding="utf-8") as f:
+                            f.writelines(current_contents)
+                        apply_diffmin(dir_repo)
+                    except Exception as e:
+                        print(e)
+                        pass
+                    finally:
+                        ID += 1
 
 
 if __name__ == '__main__':
@@ -128,8 +143,3 @@ if __name__ == '__main__':
             metrics.extend(c.get_metrics())
     pd.DataFrame(metrics).to_csv(f'./results/{ind}.csv', index=False)
 
-#     empty_repo.git.push("--set-upstream", "origin", "main")
-    print("s")
-    # empty_repo.remote(name="origin").push("main")
-    # if dir_repo:
-    #     shutil.rmtree(dir_repo)
