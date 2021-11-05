@@ -56,6 +56,7 @@ def apply_diffmin(path_to_dir):
     #                          os.path.join(path_to_dir, f"{ID}.java"), os.path.join(path_to_dir, "after.java")],
     #                         stdout=subprocess.PIPE, stderr=subprocess.STDOUT,
     #                         encoding='utf8').communicate()[0].split("\n")[3:]
+
     check_error = [i for i in file if "(Unknown Source)" in i]
     if "Exception in thread" not in file[0] and len(check_error) == 0:
         empty_repo.index.add([os.path.join(f"{ID}.java")])
@@ -66,7 +67,7 @@ def apply_diffmin(path_to_dir):
         open(os.path.join(dir_repo, f"{ID}.java"), "w").writelines(
             [l for l in open(os.path.join(dir_repo, f"after.java")).readlines()])
         empty_repo.git.add([os.path.join(f"{ID}.java")])
-        list_commits_repo.append(empty_repo.index.commit("after"))  # the real after  # todo: remove from the list after check
+        empty_repo.index.commit("after")  # the real after
         print(f"After {empty_repo.commit()}")
         empty_repo.git.stash('push')
 
@@ -83,9 +84,9 @@ def commit_to_repo():
 
     empty_repo.git.add([os.path.join(f"{ID}.java")])
     list_commits_repo.append(empty_repo.index.commit("after diffmin"))  # from diffmin commit
-    print(f"After diff {empty_repo.commit()}")
+    # print(f"After diff {empty_repo.commit()}")
     empty_repo.git.stash('push')
-    print(ID)
+    # print(ID)
 
 
 def write_file():
@@ -94,8 +95,8 @@ def write_file():
         for parent in commit.parents:
             diff_index = parent.diff(commit)
             for diff in diff_index:
-                if ID > 50:
-                    return
+                # if ID > 1:
+                #     return
                 if diff.a_path.endswith(".java") and not diff.a_path.lower().endswith("test.java"):
                     try:
                         parent_contents = diff.a_blob.data_stream.read().decode('utf-8')
@@ -138,7 +139,7 @@ if __name__ == '__main__':
 
     metrics = []
     for commit in list_commits_repo:
-        c = get_commit_diff(dir_repo, commit, analyze_diff=True)
+        c = get_commit_diff(dir_repo, commit, analyze_diff=True)  # TODO: change to True
         if c:
             metrics.extend(c.get_metrics())
     pd.DataFrame(metrics).to_csv(f'./results/{ind}.csv', index=False)
