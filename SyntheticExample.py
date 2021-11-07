@@ -29,20 +29,17 @@ def get_java_exe_by_version(version):
     return 'java'
 
 
-def read_commit(repo_path, flag=False):
+def read_commit(repo_path):
     if type(repo_path) == type(''):
         repo = git.Repo(repo_path)
-    if flag:
-        return repo
-    df = pd.read_csv("TrainSet/train.csv")
-    commits = df["commit"]
+    df = pd.read_csv("TrainSet/train_G_synthetic.csv")
     commits_object = []
-    for commit in commits[commits_start:commits_end]:
-        commits_object.append(repo.commit(commit))
+    for index, row in df.iloc[commits_start: commits_end].iterrows():
+        commits_object.append([repo.commit(row["commit"]), row["file_name"], row['commit insert bug?']])
     return commits_object
 
 
-def apply_diffmin(path_to_dir):
+def apply_diffmin(path_to_dir, file_name, label):
     global ID
 
     # TODO: uncomment
@@ -61,14 +58,14 @@ def apply_diffmin(path_to_dir):
     if "Exception in thread" not in file[0] and len(check_error) == 0:
         empty_repo.index.add([os.path.join(f"{ID}.java")])
         empty_repo.index.commit("before")  # parent commit
-        print(f"Parent {empty_repo.commit()}")
+        # print(f"Parent {empty_repo.commit()}")
         empty_repo.git.stash('push')
 
         open(os.path.join(dir_repo, f"{ID}.java"), "w").writelines(
             [l for l in open(os.path.join(dir_repo, f"after.java")).readlines()])
         empty_repo.git.add([os.path.join(f"{ID}.java")])
         empty_repo.index.commit("after")  # the real after
-        print(f"After {empty_repo.commit()}")
+        # print(f"After {empty_repo.commit()}")
         empty_repo.git.stash('push')
 
         empty_repo.git.checkout(empty_repo.commit().parents[0].hexsha)  # change to parent commit
@@ -76,14 +73,14 @@ def apply_diffmin(path_to_dir):
             for i in file:
                 f.writelines(i)
                 f.writelines("\n")
-        commit_to_repo()
+        commit_to_repo(file_name, label)
 
 
-def commit_to_repo():
+def commit_to_repo(file, label):
     global ID
 
     empty_repo.git.add([os.path.join(f"{ID}.java")])
-    list_commits_repo.append(empty_repo.index.commit("after diffmin"))  # from diffmin commit
+    list_commits_repo.append([empty_repo.index.commit("after diffmin"), file, label])  # from diffmin commit
     # print(f"After diff {empty_repo.commit()}")
     empty_repo.git.stash('push')
     # print(ID)
@@ -91,13 +88,13 @@ def commit_to_repo():
 
 def write_file():
     global ID
-    for commit in all_commits:
+    for commit, file, label in all_commits:
         for parent in commit.parents:
             diff_index = parent.diff(commit)
             for diff in diff_index:
                 # if ID > 1:
                 #     return
-                if diff.a_path.endswith(".java") and not diff.a_path.lower().endswith("test.java"):
+                if diff.b_path.lower() == file:
                     try:
                         parent_contents = diff.a_blob.data_stream.read().decode('utf-8')
                         current_contents = diff.b_blob.data_stream.read().decode('utf-8')
@@ -105,7 +102,7 @@ def write_file():
                             f.writelines(parent_contents)
                         with open(os.path.join(dir_repo, "after.java"), 'w', encoding="utf-8") as f:
                             f.writelines(current_contents)
-                        apply_diffmin(dir_repo)
+                        apply_diffmin(dir_repo, file, label)
                     except Exception as e:
                         print(e)
                         pass
@@ -130,17 +127,17 @@ if __name__ == '__main__':
     empty_repo = Repo.clone_from("https://github.com/shirshir05/SyntheticExample.git", dir_repo, branch='main')
     empty_repo.remote().pull('main')
 
-    all_commits = read_commit(repo_path, True)
-    if type(all_commits) != list:
-        all_commits = list(all_commits.iter_commits('HEAD'))[commits_start:commits_end]
+    all_commits = read_commit(repo_path)
 
     list_commits_repo = []
     write_file()
 
     metrics = []
-    for commit in list_commits_repo:
+    for commit, file, label in list_commits_repo:
         c = get_commit_diff(dir_repo, commit, analyze_diff=True)  # TODO: change to True
         if c:
-            metrics.extend(c.get_metrics())
+            dict_metrics = c.get_metrics()[0]
+            dict_metrics["label"] = label
+            dict_metrics["file"] = file
+            metrics.extend([dict_metrics])
     pd.DataFrame(metrics).to_csv(f'./results/{ind}.csv', index=False)
-
