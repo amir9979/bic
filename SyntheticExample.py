@@ -71,7 +71,7 @@ def apply_diffmin(path_to_dir):
         print(f"After {empty_repo.commit()}")
         empty_repo.git.stash('push')
 
-        empty_repo.git.checkout(list_commits_repo[-1].parents[0].hexsha)  # change to parent commit
+        empty_repo.git.checkout(empty_repo.commit().parents[0].hexsha)  # change to parent commit
         with open(os.path.join(path_to_dir, f"{ID}.java"), 'w', encoding="utf-8") as f:
             for i in file:
                 f.writelines(i)
@@ -114,7 +114,7 @@ def write_file():
 
 
 if __name__ == '__main__':
-    window_size = 3
+    window_size = 50
     ind = int(sys.argv[1])
     commits_start = ind * window_size
     commits_end = commits_start + window_size
@@ -125,7 +125,6 @@ if __name__ == '__main__':
     # dir_repo = tempfile.mkdtemp() + "/SyntheticExample"
 
     repo_path = r"local_repo"
-    repo_path = r"local_repo"
     dir_repo = "./SyntheticExample"
 
     empty_repo = Repo.clone_from("https://github.com/shirshir05/SyntheticExample.git", dir_repo, branch='main')
@@ -133,7 +132,7 @@ if __name__ == '__main__':
 
     all_commits = read_commit(repo_path, True)
     if type(all_commits) != list:
-        all_commits = list(all_commits.iter_commits('HEAD'))
+        all_commits = list(all_commits.iter_commits('HEAD'))[commits_start:commits_end]
 
     list_commits_repo = []
     write_file()
