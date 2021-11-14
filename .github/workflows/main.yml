@@ -88,7 +88,7 @@ jobs:
           fetch-depth: 0
           
       - name: execute
-        run: python SyntheticExample.py ${{ matrix.commit_ind }} #SyntheticExample.py Main.py
+        run: python Main.py ${{ matrix.commit_ind }} #SyntheticExample.py Main.py
 
       - name: Upload data
         if: ${{ always() }}
