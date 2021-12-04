@@ -2,6 +2,7 @@ import jira
 import git
 import time
 import re
+import os
 import json
 from datetime import datetime
 
@@ -116,7 +117,7 @@ class CommittedFile(object):
             self.insertions = 0
             self.deletions = 0
         self.is_java = self.name.endswith(".java")
-        self.is_test = 'test' in self.name
+        self.is_test = 'test' in self.name.split(os.path.sep)[-1].lower()
 
 
 def _get_commits_files(repo):
