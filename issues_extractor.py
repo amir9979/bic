@@ -5,7 +5,7 @@ import re
 import os
 import json
 from datetime import datetime
-
+from pydriller import Repository
 
 class Issue(object):
     def __init__(self, issue_id, type, priority, resolution, url, creation_time):
@@ -107,10 +107,10 @@ def fix_renamed_files(files):
 
 
 class CommittedFile(object):
-    def __init__(self, sha, name, insertions, deletions):
+    def __init__(self, sha, name, insertions, deletions, pydriller_file=None):
         self.sha = sha
         self.name = fix_renamed_files([name])[0]
-        if insertions.isnumeric():
+        if type(insertions) == type(0) or insertions.isnumeric():
             self.insertions = int(insertions)
             self.deletions = int(deletions)
         else:
@@ -118,6 +118,14 @@ class CommittedFile(object):
             self.deletions = 0
         self.is_java = self.name.endswith(".java")
         self.is_test = 'test' in self.name.split(os.path.sep)[-1].lower()
+        self.is_relevant = False
+        if pydriller_file is None:
+            return
+        for c, b in list(map(lambda x: (x, list(filter(lambda y: x.name == y.name, pydriller_file.methods_before))) , pydriller_file.changed_methods)):
+            if not b:
+                self.is_relevant = True
+            elif c.complexity != b[0].complexity and c.nloc != b[0].nloc:
+                self.is_relevant = True
 
 
 def _get_commits_files(repo):
@@ -127,11 +135,27 @@ def _get_commits_files(repo):
         d = d.replace('"', '').replace('\n\n', '\n').split('\n')
         commit_sha = d[0]
         comms[commit_sha] = []
+        # c = next(Repository(repo.working_dir, single=commit_sha).traverse_commits())
+        # rels[commit_sha] = list(map(lambda f: CommittedFile(commit_sha, f.new_path, f.added_lines, f.deleted_lines, f), filter(lambda f: f.language_supported and f.new_path, c.modified_files)))
         for x in d[1:-1]:
             insertions, deletions, name = x.split('\t')
             names = fix_renamed_files([name])
             comms[commit_sha].extend(list(map(lambda n: CommittedFile(commit_sha, n, insertions, deletions), names)))
     return dict(map(lambda x: (x, comms[x]), filter(lambda x: comms[x], comms)))
+
+
+def filter_commits(repo, commits):
+    rels = []
+    for commit_sha in commits:
+        # has java not test
+        if not list(filter(lambda x: x.is_java and not x.is_test, commits[commit_sha])):
+            continue
+        c = next(Repository(repo.working_dir, single=commit_sha).traverse_commits())
+        committed = list(map(lambda f: CommittedFile(commit_sha, f.new_path, f.added_lines, f.deleted_lines, f), filter(lambda f: f.language_supported and f.new_path, c.modified_files)))
+        if not list(filter(lambda x: x.is_java and not x.is_test and x.is_relevant, committed)):
+            continue
+        rels.append(commit_sha)
+    return rels
 
 
 class Commit(object):
@@ -226,7 +250,8 @@ def save_to_json(commits, repo_full_name, out_json):
 
 
 if __name__ == "__main__":
-    java_commits = _get_commits_files(git.Repo(r"c:\temp\camel2"))
+    java_commits = _get_commits_files(git.Repo(r"c:\temp\commons-compress"))
+    # relevant_java_commits = filter_commits(git.Repo(r"c:\temp\commons-compress"), java_commits)
     from functools import reduce
     all_commits = reduce(list.__add__, list(java_commits.values()), [])
     extract_json(r"local_repo", "CAMEL", 'apache/camel', 'bugfixes.json', 'non_tests_bugfixes.json')
