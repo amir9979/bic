@@ -241,17 +241,18 @@ def extract_json(repo_path, jira_key, repo_full_name, out_json, out_non_tests_js
 
 def save_to_json(commits, repo_full_name, out_json):
     issued_ = list(filter(lambda c: c.issue is not None, commits))
-    buggy = list(filter(lambda c: c.issue.type.lower() == 'bug', issued_))
+    # buggy = list(filter(lambda c: c.issue.type.lower() == 'bug', issued_))
+    buggy = issued_
     bugs_json = list(map(lambda c: {"repo_name": repo_full_name, 'fix_commit_hash': c._commit_id,
-                                    "earliest_issue_date": c.issue.creation_time.strftime("%Y-%m-%dT%H:%M:%SZ")},
+                                    "earliest_issue_date": c.issue.creation_time.strftime("%Y-%m-%dT%H:%M:%SZ"), 'issue_id': c.issue.issue_id, 'issue_type': c.issue.type.lower()},
                          buggy))
     with open(out_json, 'w') as out:
         json.dump(bugs_json, out)
 
 
 if __name__ == "__main__":
-    java_commits = _get_commits_files(git.Repo(r"c:\temp\commons-compress"))
+    java_commits = _get_commits_files(git.Repo(r"c:\temp\commons-lang"))
     # relevant_java_commits = filter_commits(git.Repo(r"c:\temp\commons-compress"), java_commits)
     from functools import reduce
     all_commits = reduce(list.__add__, list(java_commits.values()), [])
-    extract_json(r"local_repo", "CAMEL", 'apache/camel', 'bugfixes.json', 'non_tests_bugfixes.json')
+    extract_json(r"c:\temp\commons-lang", "LANG", 'apache/commons-lang', 'bugfixes2.json', 'non_tests_bugfixes2.json')
