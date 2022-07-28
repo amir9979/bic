@@ -38,6 +38,7 @@ jobs:
           repository: amir9979/javadiff
           path: ./javadiff
           fetch-depth: 0
+          ref: f41c3b142333296ccaffe6b9d3f8f569879811f6
 
       - name: Install dependencies
         run: |
