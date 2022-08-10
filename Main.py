@@ -62,7 +62,7 @@ def get_commits_files(repo):
 if __name__ == '__main__':
     # Set variables according to the project
 
-    window_size = 10
+    window_size = 30
     ind = int(sys.argv[1])
     commits_start = ind * window_size
     commits_end = commits_start + window_size
